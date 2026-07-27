@@ -428,38 +428,4 @@ const BOOKS = [
     sellPrice: 180,
     sold: false
   },
-  {
-    id: "kitap-023",
-    title: "Nihat Bilgin Yayınları 11. Sınıf Fizik Soru Kitabı",
-    publisher: "Nihat Bilgin Yayınları",
-    grade: 11,
-    examType: "AYT",
-    subject: "Fizik",
-    condition: "Az kullanılmış - İyi Durumda",
-    cover: "images/11-sinif-fizik-soru-bankasi-nihat-bilgin.jpg",
-    images: [],
-    description:
-      "Yarısı çözülü. Cilt ve kapak sağlam.",
-    originalPrice: 475,
-    originalPriceLink: "https://www.kitapisler.com/nihat-bilgin-yayinlari-11-sinif-fizik-soru-kitabi_91834.html?srsltid=AfmBOooaBeRa1Tif6yhE2iVL8PKitEdxUbKOwSYEZ4QpLfP8CyaJ9WwZ",
-    sellPrice: 150,
-    sold: false
-  },
-  {
-    id: "kitap-024",
-    title: "Nihat Bilgin Yayınları 11. Sınıf Fizik Soru Kitabı",
-    publisher: "Nihat Bilgin Yayınları",
-    grade: 11,
-    examType: "AYT",
-    subject: "Fizik",
-    condition: "Az kullanılmış - İyi Durumda",
-    cover: "images/11-sinif-fizik-soru-bankasi-nihat-bilgin.jpg",
-    images: [],
-    description:
-      "Yarısı çözülü. Cilt ve kapak sağlam.",
-    originalPrice: 475,
-    originalPriceLink: "https://www.kitapisler.com/nihat-bilgin-yayinlari-11-sinif-fizik-soru-kitabi_91834.html?srsltid=AfmBOooaBeRa1Tif6yhE2iVL8PKitEdxUbKOwSYEZ4QpLfP8CyaJ9WwZ",
-    sellPrice: 150,
-    sold: false
-  }
 ];
