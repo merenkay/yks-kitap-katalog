@@ -84,6 +84,8 @@ function cacheElements() {
   els.cartTotal = document.getElementById("cartTotal");
   els.cartClearBtn = document.getElementById("cartClearBtn");
   els.cartWhatsappBtn = document.getElementById("cartWhatsappBtn");
+  els.cartMessageText = document.getElementById("cartMessageText");
+  els.cartCopyBtn = document.getElementById("cartCopyBtn");
 }
 
 // subject alanı hem tek metin ("Kimya") hem de dizi (["Fizik","Kimya","Biyoloji"])
@@ -168,6 +170,7 @@ function bindEvents() {
       e.preventDefault();
     }
   });
+  els.cartCopyBtn.addEventListener("click", copyOrderMessage);
 
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape" && e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
@@ -469,15 +472,20 @@ function renderCartList() {
   els.cartTotal.textContent = `${total} TL`;
 
   if (items.length === 0) {
+    els.cartMessageText.value = "";
     els.cartWhatsappBtn.setAttribute("aria-disabled", "true");
     els.cartWhatsappBtn.href = "#";
   } else {
+    const message = buildOrderMessage(items, total);
+    els.cartMessageText.value = message;
     els.cartWhatsappBtn.removeAttribute("aria-disabled");
-    els.cartWhatsappBtn.href = buildWhatsappLink(items, total);
+    // Numara belirtilmez: WhatsApp açılır ve kullanıcı kendi rehberinden
+    // mesajı göndermek istediği kişiyi/kişileri kendisi seçer.
+    els.cartWhatsappBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
   }
 }
 
-function buildWhatsappLink(items, total) {
+function buildOrderMessage(items, total) {
   const lines = [
     "Merhaba, YKS Kitap Kataloğu üzerinden şu kitapları almak istiyorum:",
     "",
@@ -485,7 +493,24 @@ function buildWhatsappLink(items, total) {
     "",
     `Toplam: ${total} TL`
   ];
-  return `https://wa.me/${SELLER_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+  return lines.join("\n");
+}
+
+async function copyOrderMessage() {
+  const text = els.cartMessageText.value;
+  if (!text) return;
+
+  const originalLabel = els.cartCopyBtn.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    els.cartCopyBtn.textContent = "✅ Kopyalandı";
+  } catch {
+    els.cartMessageText.select();
+    els.cartMessageText.setSelectionRange(0, text.length);
+  }
+  setTimeout(() => {
+    els.cartCopyBtn.textContent = originalLabel;
+  }, 1500);
 }
 
 // ---- Yardımcılar ----

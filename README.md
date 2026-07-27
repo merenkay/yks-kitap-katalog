@@ -41,26 +41,21 @@ ne işe yaradığı ayrıntılı yorum olarak yazıyor):
 }
 ```
 
-## Sepet ve WhatsApp'tan sipariş
+## Sepet ve WhatsApp'ta paylaşma
 
 Ziyaretçiler beğendikleri kitapları "Sepete Ekle" ile sepetlerine ekleyip, sağ
-alttaki 🛒 **Sepet** butonundan sepetlerini görüp **"WhatsApp'tan Sipariş
-Ver"** butonuyla sana doğrudan WhatsApp üzerinden, seçtiği kitapların ve
-toplam tutarın yazılı olduğu hazır bir mesaj gönderebiliyor (ödeme/kargo
-kısmını sen mesajlaştıktan sonra ayarlarsın — statik bir sitede gerçek bir
-ödeme sistemi kurmak mümkün olmadığı için en pratik ve güvenilir yöntem bu).
-Sepet, ziyaretçinin tarayıcısında saklanır; sayfayı kapatıp açsa bile kaybolmaz.
+alttaki 🛒 **Sepet** butonundan sepetlerini görebiliyor. Sepet penceresinde:
 
-Mesajın **senin** WhatsApp'ına gitmesi için `js/data.js` dosyasının en üstündeki
+- Seçilen kitapların ve toplam tutarın yazılı olduğu **sipariş metni** bir
+  kutuda gösterilir, "📋 Metni Kopyala" ile panoya kopyalanabilir.
+- **"WhatsApp'ta Paylaş"** butonuna basınca WhatsApp açılır; ziyaretçi orada
+  kendi rehberinden mesajı **kime göndermek istediğini kendisi seçer**
+  (sabit bir numaraya zorlanmaz — link numarasız açıldığı için WhatsApp
+  otomatik olarak "kime göndermek istersiniz?" ekranını gösterir).
 
-```js
-const SELLER_WHATSAPP_NUMBER = "905XXXXXXXXX";
-```
-
-satırını kendi numaranla değiştirmen gerekiyor. Numaranı başında ülke kodu
-(Türkiye için 90) olacak şekilde, boşluksuz ve `+` işaretsiz yaz. Örneğin
-telefon numaran `05XX XXX XX XX` ise, baştaki `0`'ı silip yerine `90` koyarak
-`"905XXXXXXXXX"` şeklinde yazman yeterli.
+Bu yüzden ayarlaman gereken bir telefon numarası yok; her şey otomatik
+çalışır. Sepet, ziyaretçinin tarayıcısında saklanır; sayfayı kapatıp açsa
+bile kaybolmaz.
 
 Branş filtresi listedeki kitaplardan **otomatik** oluşturulur; yeni bir branş
 yazman yeterli, filtreye elle eklemene gerek yok.

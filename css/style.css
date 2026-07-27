@@ -277,6 +277,43 @@ a {
   padding: 1.5rem 0;
 }
 
+.cart__message {
+  margin-top: 1.2rem;
+}
+
+.cart__message label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.cart__message textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.6rem 0.7rem;
+  line-height: 1.4;
+}
+
+.btn--copy {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.8rem;
+}
+
+.cart__hint {
+  margin: 0.8rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .cart__footer {
   margin-top: 1.2rem;
   border-top: 1px solid var(--border);

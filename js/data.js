@@ -45,17 +45,13 @@
 */
 
 /*
-  SEPET / SİPARİŞ AYARI
+  SEPET / SİPARİŞ
   ================
-  Ziyaretçi "Sepete Ekle" ile kitap seçip sepetini WhatsApp üzerinden sana
-  sipariş mesajı olarak gönderebiliyor (ödeme alt yapısı olmadığı için en
-  pratik yöntem bu). Mesajın senin WhatsApp'ına gitmesi için aşağıdaki numarayı
-  kendi numaranla değiştir.
-
-  Format: başında ülke kodu olacak şekilde SADECE RAKAM (boşluksuz, +'sız, 0'sız).
-  Örnek: 05XX XXX XX XX numaran ise -> "905XXXXXXXXX" yaz (baştaki 0'ı sil, yerine 90 koy).
+  Ziyaretçi "Sepete Ekle" ile kitap seçip sepetini oluşturuyor. Sepet penceresinde
+  sipariş metni bir kutuda gösteriliyor ve "WhatsApp'ta Paylaş" butonuna basınca
+  WhatsApp açılıyor; ziyaretçi orada kendi rehberinden mesajı kime göndermek
+  istediğini kendisi seçiyor (sabit bir numara tanımlamana gerek yok).
 */
-const SELLER_WHATSAPP_NUMBER = "905XXXXXXXXX";
 
 const BOOKS = [
   {
