@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   populateSubjectFilter();
   bindEvents();
   render();
+  updateCartUI();
 });
 
 function cacheElements() {
@@ -71,11 +72,29 @@ function cacheElements() {
   els.modalDescription = document.getElementById("modalDescription");
   els.modalOriginalPrice = document.getElementById("modalOriginalPrice");
   els.modalSellPrice = document.getElementById("modalSellPrice");
+  els.modalAddToCart = document.getElementById("modalAddToCart");
+
+  els.cartFab = document.getElementById("cartFab");
+  els.cartBadge = document.getElementById("cartBadge");
+  els.cartModal = document.getElementById("cartModal");
+  els.cartModalClose = document.getElementById("cartModalClose");
+  els.cartModalBackdrop = document.getElementById("cartModalBackdrop");
+  els.cartList = document.getElementById("cartList");
+  els.cartEmpty = document.getElementById("cartEmpty");
+  els.cartTotal = document.getElementById("cartTotal");
+  els.cartClearBtn = document.getElementById("cartClearBtn");
+  els.cartWhatsappBtn = document.getElementById("cartWhatsappBtn");
+}
+
+// subject alanı hem tek metin ("Kimya") hem de dizi (["Fizik","Kimya","Biyoloji"])
+// olabilir. Bu fonksiyon her ikisini de düz bir diziye çevirir.
+function subjectList(subject) {
+  return Array.isArray(subject) ? subject : [subject];
 }
 
 function populateSubjectFilter() {
-  const subjects = Array.from(new Set(BOOKS.map((b) => b.subject))).sort((a, b) =>
-    a.localeCompare(b, "tr")
+  const subjects = Array.from(new Set(BOOKS.flatMap((b) => subjectList(b.subject)))).sort(
+    (a, b) => a.localeCompare(b, "tr")
   );
   subjects.forEach((subject) => {
     const opt = document.createElement("option");
@@ -132,11 +151,32 @@ function bindEvents() {
   els.modalBackdrop.addEventListener("click", closeModal);
   els.modalPrev.addEventListener("click", () => stepGallery(-1));
   els.modalNext.addEventListener("click", () => stepGallery(1));
+  els.modalAddToCart.addEventListener("click", () => {
+    if (currentModalBook) toggleCartItem(currentModalBook);
+  });
+
+  els.cartFab.addEventListener("click", openCartModal);
+  els.cartModalClose.addEventListener("click", closeCartModal);
+  els.cartModalBackdrop.addEventListener("click", closeCartModal);
+  els.cartClearBtn.addEventListener("click", () => {
+    cart = [];
+    saveCart();
+    updateCartUI();
+  });
+  els.cartWhatsappBtn.addEventListener("click", (e) => {
+    if (els.cartWhatsappBtn.getAttribute("aria-disabled") === "true") {
+      e.preventDefault();
+    }
+  });
+
   document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" && e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     if (els.modal.classList.contains("open")) {
       if (e.key === "Escape") closeModal();
       if (e.key === "ArrowLeft") stepGallery(-1);
       if (e.key === "ArrowRight") stepGallery(1);
+    } else if (els.cartModal.classList.contains("open") && e.key === "Escape") {
+      closeCartModal();
     }
   });
 }
@@ -146,7 +186,7 @@ function getFilteredBooks() {
     if (state.hideSold && book.sold) return false;
     if (state.grade !== "all" && String(book.grade) !== state.grade) return false;
     if (state.examType !== "all" && book.examType !== state.examType) return false;
-    if (state.subject !== "all" && book.subject !== state.subject) return false;
+    if (state.subject !== "all" && !subjectList(book.subject).includes(state.subject)) return false;
     if (state.search && !book.title.toLowerCase().includes(state.search)) return false;
     return true;
   });
@@ -178,6 +218,7 @@ function buildCard(book) {
   card.tabIndex = 0;
   card.setAttribute("role", "button");
   card.setAttribute("aria-label", `${book.title} detaylarını gör`);
+  card.dataset.bookId = book.id;
 
   const gradeLabel = book.grade === "Genel" ? "Genel" : `${book.grade}. Sınıf`;
 
@@ -191,7 +232,9 @@ function buildCard(book) {
       <div class="badges">
         <span class="badge badge--grade">${escapeHtml(gradeLabel)}</span>
         <span class="badge badge--exam badge--${examClass(book.examType)}">${escapeHtml(book.examType)}</span>
-        <span class="badge badge--subject">${escapeHtml(book.subject)}</span>
+        ${subjectList(book.subject)
+          .map((s) => `<span class="badge badge--subject">${escapeHtml(s)}</span>`)
+          .join("")}
       </div>
       <h3 class="card__title">${escapeHtml(book.title)}</h3>
       ${book.publisher ? `<p class="card__publisher">${escapeHtml(book.publisher)}</p>` : ""}
@@ -208,7 +251,16 @@ function buildCard(book) {
         }
         <span class="price price--sell">${book.sellPrice} TL</span>
       </div>
-      <button class="btn btn--detail" type="button">Detayları Gör</button>
+      <div class="card__actions">
+        <button class="btn btn--detail" type="button">Detayları Gör</button>
+        ${
+          book.sold
+            ? ""
+            : `<button class="btn btn--cart" type="button" data-cart-toggle>${
+                isInCart(book.id) ? "Sepette ✓" : "Sepete Ekle"
+              }</button>`
+        }
+      </div>
     </div>
   `;
 
@@ -220,6 +272,15 @@ function buildCard(book) {
       open();
     }
   });
+
+  const cartBtn = card.querySelector("[data-cart-toggle]");
+  if (cartBtn) {
+    cartBtn.classList.toggle("btn--in-cart", isInCart(book.id));
+    cartBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleCartItem(book);
+    });
+  }
 
   return card;
 }
@@ -233,8 +294,10 @@ function examClass(examType) {
 // ---- Modal / Galeri ----
 let galleryImages = [];
 let galleryIndex = 0;
+let currentModalBook = null;
 
 function openModal(book) {
+  currentModalBook = book;
   galleryImages = [book.cover, ...(book.images || [])].filter(Boolean);
   if (galleryImages.length === 0) galleryImages = [PLACEHOLDER_IMG];
   galleryIndex = 0;
@@ -245,7 +308,9 @@ function openModal(book) {
   els.modalBadges.innerHTML = `
     <span class="badge badge--grade">${escapeHtml(gradeLabel)}</span>
     <span class="badge badge--exam badge--${examClass(book.examType)}">${escapeHtml(book.examType)}</span>
-    <span class="badge badge--subject">${escapeHtml(book.subject)}</span>
+    ${subjectList(book.subject)
+      .map((s) => `<span class="badge badge--subject">${escapeHtml(s)}</span>`)
+      .join("")}
     ${book.sold ? '<span class="badge badge--sold">SATILDI</span>' : ""}
   `;
   els.modalCondition.textContent = `Kullanım Durumu: ${book.condition}`;
@@ -257,6 +322,13 @@ function openModal(book) {
       : `Orijinal Fiyat: ${book.originalPrice} TL`
     : "";
   els.modalSellPrice.textContent = `İkinci El Fiyatım: ${book.sellPrice} TL`;
+
+  if (book.sold) {
+    els.modalAddToCart.style.display = "none";
+  } else {
+    els.modalAddToCart.style.display = "";
+    setCartButtonState(els.modalAddToCart, book.id);
+  }
 
   renderGallery();
 
@@ -298,6 +370,122 @@ function stepGallery(delta) {
 function closeModal() {
   els.modal.classList.remove("open");
   document.body.classList.remove("modal-open");
+}
+
+// ---- Sepet ----
+// Sepette sadece kitap id'leri tutulur, tarayıcının localStorage'ında saklanır
+// (sayfa yenilense/kapansa da sepet kaybolmaz).
+const CART_STORAGE_KEY = "yksKitapSepeti";
+
+function loadCart() {
+  let raw;
+  try {
+    raw = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
+  } catch {
+    raw = [];
+  }
+  if (!Array.isArray(raw)) return [];
+  // Satılmış ya da artık listede olmayan kitapları sepette tutma
+  return raw.filter((id) => BOOKS.some((b) => b.id === id && !b.sold));
+}
+
+let cart = loadCart();
+
+function saveCart() {
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+}
+
+function isInCart(id) {
+  return cart.includes(id);
+}
+
+function toggleCartItem(book) {
+  if (book.sold) return;
+  cart = isInCart(book.id) ? cart.filter((id) => id !== book.id) : [...cart, book.id];
+  saveCart();
+  updateCartUI();
+}
+
+function setCartButtonState(btn, bookId) {
+  const inCart = isInCart(bookId);
+  btn.textContent = inCart ? "Sepette ✓" : "Sepete Ekle";
+  btn.classList.toggle("btn--in-cart", inCart);
+}
+
+function updateCartUI() {
+  els.cartBadge.textContent = String(cart.length);
+  els.cartBadge.hidden = cart.length === 0;
+
+  els.grid.querySelectorAll(".card").forEach((cardEl) => {
+    const btn = cardEl.querySelector("[data-cart-toggle]");
+    if (btn) setCartButtonState(btn, cardEl.dataset.bookId);
+  });
+
+  if (currentModalBook && !currentModalBook.sold) {
+    setCartButtonState(els.modalAddToCart, currentModalBook.id);
+  }
+
+  if (els.cartModal.classList.contains("open")) {
+    renderCartList();
+  }
+}
+
+function openCartModal() {
+  renderCartList();
+  els.cartModal.classList.add("open");
+  document.body.classList.add("modal-open");
+}
+
+function closeCartModal() {
+  els.cartModal.classList.remove("open");
+  document.body.classList.remove("modal-open");
+}
+
+function renderCartList() {
+  const items = cart.map((id) => BOOKS.find((b) => b.id === id)).filter(Boolean);
+
+  els.cartList.innerHTML = "";
+  els.cartEmpty.style.display = items.length === 0 ? "block" : "none";
+
+  let total = 0;
+  items.forEach((book) => {
+    total += book.sellPrice;
+
+    const li = document.createElement("li");
+    li.className = "cart__item";
+    li.innerHTML = `
+      <img src="${escapeAttr(book.cover)}" alt="${escapeAttr(book.title)}"
+           onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
+      <div class="cart__item-info">
+        <p class="cart__item-title">${escapeHtml(book.title)}</p>
+        <p class="cart__item-price">${book.sellPrice} TL</p>
+      </div>
+      <button class="cart__item-remove" type="button" aria-label="Sepetten çıkar">✕</button>
+    `;
+    li.querySelector(".cart__item-remove").addEventListener("click", () => toggleCartItem(book));
+    els.cartList.appendChild(li);
+  });
+
+  els.cartTotal.textContent = `${total} TL`;
+
+  if (items.length === 0) {
+    els.cartWhatsappBtn.setAttribute("aria-disabled", "true");
+    els.cartWhatsappBtn.href = "#";
+  } else {
+    els.cartWhatsappBtn.removeAttribute("aria-disabled");
+    els.cartWhatsappBtn.href = buildWhatsappLink(items, total);
+  }
+}
+
+function buildWhatsappLink(items, total) {
+  const lines = [
+    "Merhaba, YKS Kitap Kataloğu üzerinden şu kitapları almak istiyorum:",
+    "",
+    ...items.map((b, i) => `${i + 1}. ${b.title} - ${b.sellPrice} TL`),
+    "",
+    `Toplam: ${total} TL`
+  ];
+  return `https://wa.me/${SELLER_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
 }
 
 // ---- Yardımcılar ----

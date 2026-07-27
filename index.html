@@ -14,6 +14,11 @@
   <p>Kullandığım TYT / AYT kaynak kitaplarının ikinci el satış listesi</p>
 </header>
 
+<button class="cart-fab" id="cartFab" type="button" aria-label="Sepeti aç">
+  🛒 <span>Sepet</span>
+  <span class="cart-fab__badge" id="cartBadge" hidden>0</span>
+</button>
+
 <div class="filters">
   <select id="gradeFilter" aria-label="Sınıf filtresi">
     <option value="all">Tüm Sınıflar</option>
@@ -82,6 +87,29 @@
         <div class="modal__prices">
           <p class="modal__original" id="modalOriginalPrice"></p>
           <p class="modal__sell" id="modalSellPrice"></p>
+        </div>
+        <button class="btn btn--cart" id="modalAddToCart" type="button">Sepete Ekle</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sepet Modalı -->
+<div class="modal" id="cartModal" aria-hidden="true">
+  <div class="modal__backdrop" id="cartModalBackdrop"></div>
+  <div class="modal__dialog modal__dialog--cart" role="dialog" aria-modal="true" aria-labelledby="cartModalTitle">
+    <button class="modal__close" id="cartModalClose" aria-label="Kapat">✕</button>
+    <div class="cart">
+      <h2 id="cartModalTitle">🛒 Sepetim</h2>
+      <ul class="cart__list" id="cartList"></ul>
+      <p class="cart__empty" id="cartEmpty">Sepetin boş. Kataloktan beğendiğin kitaplarda "Sepete Ekle"ye bas.</p>
+      <div class="cart__footer">
+        <div class="cart__total">Toplam: <strong id="cartTotal">0 TL</strong></div>
+        <div class="cart__actions">
+          <button class="btn btn--reset" id="cartClearBtn" type="button">Sepeti Temizle</button>
+          <a class="btn btn--whatsapp" id="cartWhatsappBtn" href="#" target="_blank" rel="noopener noreferrer">
+            WhatsApp'tan Sipariş Ver
+          </a>
         </div>
       </div>
     </div>

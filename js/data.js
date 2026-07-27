@@ -13,6 +13,11 @@
   - subject       : Branş adı (Türkçe, Matematik, Geometri, Fizik, Kimya, Biyoloji,
                     Tarih, Coğrafya, Felsefe, Din Kültürü, İngilizce, Edebiyat, vb.)
                     Kendi branşlarını serbestçe yazabilirsin, filtre listesi otomatik oluşur.
+                    Kitap birden fazla branşı birden kapsıyorsa (ör. Fizik+Kimya+Biyoloji
+                    ortak deneme kitabı) tek bir metin yerine dizi de yazabilirsin:
+                    subject: ["Fizik", "Kimya", "Biyoloji"]
+                    Bu kitap, üç branş filtresinden hangisi seçilirse seçilsin listede
+                    görünür ve kartında/detayında üç branş etiketi de gösterilir.
   - condition     : Kullanım durumu, serbest metin. Örn:
                     "Sıfır (Hiç Kullanılmamış)", "Az Kullanılmış - Temiz",
                     "Kullanılmış - İyi Durumda", "Kullanılmış - Bazı Sayfalar Yazılı"
@@ -25,145 +30,288 @@
   - originalPrice : Kitabın orijinal/yeni fiyatı (sayı, TL). Bilmiyorsan null yaz.
   - originalPriceLink : Orijinal fiyatın görülebileceği/satın alınabileceği çalışan
                     link (yayınevi sitesi, kitapyurdu, trendyol vb.). Yoksa "" bırak.
+
+                    Kitap artık internette satılmıyorsa / hiçbir yerde linkini
+                    bulamadıysan (baskısı tükenmiş, sitesi kalkmış vb.):
+                      originalPrice: null,
+                      originalPriceLink: "",
+                    şeklinde bırak. Bu durumda kartta/detayda orijinal fiyat
+                    satırı hiç görünmez, sadece senin ikinci el satış fiyatın
+                    gösterilir. Sakın rastgele bir sayı (ör. 0) ya da başka bir
+                    kitabın linkini yapıştırma — yanlış/çalışmayan link
+                    göstermektense hiç göstermemek daha doğru.
   - sellPrice     : Senin ikinci el satış fiyatın (sayı, TL). Zorunlu.
   - sold          : true/false - Kitap satıldıysa true yap, "SATILDI" etiketiyle görünür.
 */
 
+/*
+  SEPET / SİPARİŞ AYARI
+  ================
+  Ziyaretçi "Sepete Ekle" ile kitap seçip sepetini WhatsApp üzerinden sana
+  sipariş mesajı olarak gönderebiliyor (ödeme alt yapısı olmadığı için en
+  pratik yöntem bu). Mesajın senin WhatsApp'ına gitmesi için aşağıdaki numarayı
+  kendi numaranla değiştir.
+
+  Format: başında ülke kodu olacak şekilde SADECE RAKAM (boşluksuz, +'sız, 0'sız).
+  Örnek: 05XX XXX XX XX numaran ise -> "905XXXXXXXXX" yaz (baştaki 0'ı sil, yerine 90 koy).
+*/
+const SELLER_WHATSAPP_NUMBER = "905XXXXXXXXX";
+
 const BOOKS = [
   {
     id: "kitap-001",
-    title: "TYT Matematik Soru Bankası",
-    publisher: "3D Yayınları",
-    grade: "Genel",
-    examType: "TYT",
-    subject: "Matematik",
-    condition: "Az Kullanılmış - Temiz",
-    cover: "images/tyt-matematik.jpg",
-    images: [],
-    description:
-      "TYT matematik müfredatının tamamını konu anlatımlı özetlerle destekleyen soru bankası. İçinde birkaç sayfada kurşun kalemle çözüm notu var, silinmiş durumda. Cilt ve kapak sağlam.",
-    originalPrice: 180,
-    originalPriceLink: "https://www.3dyayinlari.com/",
-    sellPrice: 90,
-    sold: false
-  },
-  {
-    id: "kitap-002",
-    title: "AYT Geometri Konu Anlatımlı",
-    publisher: "Palme Yayınları",
-    grade: 11,
-    examType: "AYT",
-    subject: "Geometri",
-    condition: "Sıfır (Hiç Kullanılmamış)",
-    cover: "images/ayt-geometri.jpg",
-    images: [],
-    description:
-      "Hiç açılmamış, folyosu yeni çıkarılmış. AYT geometri konularının tamamı örnek çözümlerle anlatılıyor.",
-    originalPrice: 150,
-    originalPriceLink: "https://www.palmeyayincilik.com.tr/",
-    sellPrice: 110,
-    sold: false
-  },
-  {
-    id: "kitap-003",
-    title: "TYT-AYT Fizik Formül Kitapçığı",
-    publisher: "Endemik Yayınları",
-    grade: "Genel",
-    examType: "TYT-AYT",
-    subject: "Fizik",
-    condition: "Kullanılmış - İyi Durumda",
-    cover: "images/fizik-formul.jpg",
-    images: [],
-    description:
-      "Cep boyutunda formül kitapçığı, sınav öncesi hızlı tekrar için idealdi. Kapağında hafif köşe kıvrılması var.",
-    originalPrice: 60,
-    originalPriceLink: "",
-    sellPrice: 25,
-    sold: false
-  },
-  {
-    id: "kitap-004",
-    title: "10. Sınıf Türkçe Konu Anlatım Föyleri",
-    publisher: "Bilfen Yayıncılık",
+    title: "0`dan 10`a Kimya Konu Anlatımlı Soru Bankası Tonguç Akademi",
+    publisher: "Tonguç Akademi",
     grade: 10,
     examType: "TYT",
-    subject: "Türkçe",
-    condition: "Kullanılmış - Bazı Sayfalar Yazılı",
-    cover: "images/10-turkce.jpg",
-    images: [],
-    description:
-      "Paragraf, dil bilgisi ve anlam bilgisi konularını kapsayan föy seti. Bazı sayfalarda kendi el yazım notlarım var, fotokopiyle çekip temiz halini de kullanabilirsin.",
-    originalPrice: 120,
-    originalPriceLink: "",
-    sellPrice: 45,
-    sold: true
-  },
-  {
-    id: "kitap-005",
-    title: "AYT Kimya Soru Bankası",
-    publisher: "Acil Yayınları",
-    grade: 12,
-    examType: "AYT",
     subject: "Kimya",
     condition: "Az Kullanılmış - Temiz",
-    cover: "images/ayt-kimya.jpg",
+    cover: "images/tonguc10kimya.jpg",
     images: [],
     description:
-      "Modern kimya, kimyasal tepkimeler ve organik kimya konularını içeren geniş soru bankası. Çözümlü.",
-    originalPrice: 165,
-    originalPriceLink: "https://www.acilyayinlari.com/",
-    sellPrice: 70,
-    sold: false
-  },
-  {
-    id: "kitap-006",
-    title: "9. Sınıf Biyoloji Konu Anlatımlı",
-    publisher: "Aydın Yayınları",
-    grade: 9,
-    examType: "TYT",
-    subject: "Biyoloji",
-    condition: "Sıfır (Hiç Kullanılmamış)",
-    cover: "images/9-biyoloji.jpg",
-    images: [],
-    description:
-      "9. sınıf müfredatına uygun, bol görselli konu anlatım kitabı. Kullanılmadı.",
-    originalPrice: 140,
-    originalPriceLink: "",
+      "İlk 25sf çözülü, kitap 214sf. Cilt ve kapak sağlam.",
+    originalPrice: 259,
+    originalPriceLink: "https://www.kitapsec.com/Products/0dan-10a-Kimya-Konu-Anlatimli-Soru-Bankasi-Tonguc-Akademi-317870.html?srsltid=AfmBOoqIsVCwwzo6lPzKdx2zKFXnGvfJ8hCx53KPh1ajUgTy_JOGTbJc",
     sellPrice: 100,
     sold: false
   },
   {
-    id: "kitap-007",
-    title: "TYT Tarih Kampı",
-    publisher: "Tonguç Akademi",
-    grade: "Genel",
+    id: "kitap-002",
+    title: "Çap Yayınları 10. Sınıf Fen Lisesi Kimya Soru Bankası",
+    publisher: "Çap Yayınları",
+    grade: 10,
     examType: "TYT",
-    subject: "Tarih",
-    condition: "Kullanılmış - İyi Durumda",
-    cover: "images/tyt-tarih.jpg",
+    subject: "Kimya",
+    condition: "İkinci El - İyi Durumda",
+    cover: "images/cap10kimya.jpg",
     images: [],
     description:
-      "Kısa ve öz konu anlatımlarıyla TYT tarih konularını tek kitapta topluyor. Kapak köşeleri hafif yıpranmış.",
-    originalPrice: 95,
-    originalPriceLink: "",
-    sellPrice: 40,
+      "Tamamı kurşun kalem ile çözülmüş, bazı sayfalarda notlar var. Cilt ve kapak sağlam.",
+    originalPrice: 220,
+    originalPriceLink: "https://www.trendyol.com/cap-yayinlari/cap-10-sinif-fen-lisesi-kimya-soru-bankasi-p-32937712",
+    sellPrice: 100,
+    sold: false
+  },
+  {
+    id: "kitap-003",
+    title: "0 dan 9 a Kimya Konu Anlatımlı Soru Bankası Tonguç Akademi",
+    publisher: "Tonguç Akademi",
+    grade: 9,
+    examType: "TYT",
+    subject: "Kimya",
+    condition: "İkinci El - İyi Durumda",
+    cover: "images/tonguc9kimya.jpg",
+    images: [],
+    description:
+      "Yarısı çözülü. Cilt ve kapak sağlam.",
+    originalPrice: 269,
+    originalPriceLink: "https://www.kitapsec.com/Products/0-dan-9-a-Kimya-Konu-Anlatimli-Soru-Bankasi-Tonguc-Akademi-374119.html?srsltid=AfmBOoobIkLhCouCSKfT8_a8bEt4D4PPsSgXeCz7HNtsDaGanIWHs3gF",
+    sellPrice: 100,
+    sold: false
+  },
+  {
+    id: "kitap-004",
+    title: "Orbital Yayınları 9. Sınıf Kimya Soru Bankası",
+    publisher: "Orbital Yayınları",
+    grade: 9,
+    examType: "TYT",
+    subject: "Kimya",
+    condition: "İkinci El - İyi Durumda",
+    cover: "images/orbital9kimya.jpg",
+    images: [],
+    description:
+      "Yarısı çözülü. Cilt ve kapak sağlam.",
+    originalPrice: 449,
+    originalPriceLink: "https://www.kitapisler.com/orbital-yayinlari-9-sinif-kimya-soru-bankasi_102167.html?srsltid=AfmBOoraFGtPblzxfBC0J3SOXIEChQvSaStrSC-4j-VEKz9PsDXSttsj",
+    sellPrice: 150,
+    sold: true
+  },
+  {
+    id: "kitap-005",
+    title: "ENS Yayıncılık 10. Sınıf Biyoloji Defter Kitap",
+    publisher: "ENS Yayıncılık",
+    grade: 10,
+    examType: "TYT",
+    subject: "Biyoloji",
+    condition: "İkinci El - İyi Durumda",
+    cover: "images/10-sinif-biyoloji-ens-yayinlari.jpg",
+    images: [],
+    description:
+      "Yarısı çözülü. Cilt ve kapak sağlam.",
+    originalPrice: 215,
+    originalPriceLink: "https://www.kitapisler.com/ens-yayincilik-10-sinif-biyoloji-defter-kitap_85443.html?srsltid=AfmBOooRbFeXjVRZht_vw5TxBR55-nbfvxTr5A7mrwgK7B0u2kcr_Hu9",
+    sellPrice: 100,
+    sold: false
+  },
+  {
+    id: "kitap-006",
+    title: "Palme 9. Sınıf Kimya Soru Kitabı Palme Yayınları",
+    publisher: "Palme Yayınları",
+    grade: 9,
+    examType: "TYT",
+    subject: "Kimya",
+    condition: "Az kullanılmış - İyi Durumda",
+    cover: "images/palme-9-sinif-kimya-soru-bankasi.jpg",
+    images: [],
+    description:
+      "İlk ünitesi çözülü. Cilt ve kapak sağlam.",
+    originalPrice: 175,
+    originalPriceLink: "https://www.indekskitap.com/urun/palme-9-sinif-kimya-soru-kitabi-palme-yayinlari?srsltid=AfmBOorWKyT3cfAkhdpG7niscuMwPriHHOTAJAPPVGdlwuscfn884aRn",
+    sellPrice: 80,
+    sold: false
+  },
+  {
+    id: "kitap-007",
+    title: "Bilgi Sarmal Yayınları TYT Fizik 40 x 7 Branş Denemeleri",
+    publisher: "Bilgi Sarmal Yayınları",
+    grade: "Genel",
+    examType: "TYT",
+    subject: "Fizik",
+    condition: "Az Kullanılmış - Temiz",
+    cover: "images/tyt-fizik-brans-denemeleri-bilgi-sarmal.jpg",
+    images: [],
+    description:
+      "İlk 4 deneme çözülü, 36'sı boş. Cilt ve kapak sağlam.",
+    originalPrice: 199,
+    originalPriceLink: "https://www.kitapisler.com/bilgi-sarmal-yayinlari-tyt-fizik-40-x-7-brans-denemeleri_87359.html?srsltid=AfmBOorL6CaHHKpCeVAqY0o5ZkvlzEiGedbqMfutYRUkMyShCAEMvcKT",
+    sellPrice: 50,
     sold: false
   },
   {
     id: "kitap-008",
-    title: "AYT Edebiyat Soru Bankası",
-    publisher: "Karekök Yayınları",
+    title: "Limit Yayınları TYT FKB 3 Ders + 4 Test = 7 Gün",
+    publisher: "Limit Yayınları",
     grade: 12,
-    examType: "AYT",
-    subject: "Edebiyat",
-    condition: "Az Kullanılmış - Temiz",
-    cover: "images/ayt-edebiyat.jpg",
+    examType: "TYT",
+    subject: ["Fizik", "Kimya", "Biyoloji"],
+    condition: "Az kullanılmış - İyi Durumda",
+    cover: "images/tyt-fen-bilimleri-deneme-limit-yayinlari.jpg",
     images: [],
     description:
-      "Edebi sanatlar, akımlar ve dönemler konularını kapsayan çözümlü soru bankası.",
-    originalPrice: 155,
-    originalPriceLink: "https://www.karekokyayinlari.com.tr/",
-    sellPrice: 65,
+      "Yarısı çözülü. Cilt ve kapak sağlam.",
+    originalPrice: 100,
+    originalPriceLink: "https://www.nadirkitap.com/limit-yayinlari-tyt-kronometre-fkb-fizik-kimya-biyoloji-3-4-7-gun-7-deneme-komisyon-kitap35501007.html?srsltid=AfmBOoos5p-1TGUetYW6w0LN7agqnBr8g2mJtklhGuGF_yv4cCko4jqN",
+    sellPrice: 30,
+    sold: false
+  },
+  {
+    id: "kitap-009",
+    title: "Kafa Dengi TYT Fizik Temel ve Orta Düzey Soru Bankası",
+    publisher: "Kafa Dengi",
+    grade: "Genel",
+    examType: "TYT",
+    subject: "Fizik",
+    condition: "Tertemiz - İyi Durumda",
+    cover: "images/tyt-fizik-kafadengi.jpg",
+    images: [],
+    description:
+      "Sadece dalgalar çözülmüş, tertemiz. Cilt ve kapak sağlam.",
+    originalPrice: 525,
+    originalPriceLink: "https://www.kitapisler.com/kafa-dengi-yayinlari-tyt-fizik-temel-ve-orta-duzey-soru-bankasi_53764.html",
+    sellPrice: 200,
+    sold: false
+  },
+  {
+    id: "kitap-010",
+    title: "TYT AYT Fizik Son 20 Yıl Konularına Göre Çıkmış Sorular ve Çözümleri A Yayınları",
+    publisher: "A Yayınları",
+    grade: "Genel",
+    examType: "TYT-AYT",
+    subject: "Fizik",
+    condition: "Tertemiz - İyi Durumda",
+    cover: "images/tyt-ayt-fi-zi-k-son-20-yil-cikmis-sorular.jpg",
+    images: [],
+    description:
+      "Tamamı tertemiz. Cilt ve kapak sağlam.",
+    originalPrice: 120,
+    originalPriceLink: "https://www.kitapsec.com/Products/TYT-AYT-Fizik-Son-20-Yil-Konularina-Gore-Cikmis-Sorular-ve-Cozumleri-A-Yayinlari-393967.html?srsltid=AfmBOorV_caITc6Yte_PyPCSDImSiqaUTcZIr5J6gOMxVKVgiFKG8eFg",
+    sellPrice: 40,
+    sold: false
+  },
+  {
+    id: "kitap-011",
+    title: "10. Sınıf Tarih Özet Pano Yayınları",
+    publisher: "Pano Yayınları",
+    grade: 10,
+    examType: "TYT",
+    subject: "Tarih",
+    condition: "Tertemiz - İyi Durumda",
+    cover: "images/10-sinif-tarih-ozet-atlasi.jpg",
+    images: [],
+    description:
+      "Tamamı tertemiz. Cilt ve kapak sağlam.",
+    originalPrice: 120,
+    originalPriceLink: "https://www.kitapsec.com/Products/10-Sinif-Tarih-Ozet-Pano-Yayinlari-546423.html?srsltid=AfmBOooq1mwL_5ssGfn2ubbEpllSXCBzvlSKmgH83eoCHrjmTXidwcEg",
+    sellPrice: 20,
+    sold: false
+  },
+  {
+    id: "kitap-012",
+    title: "9. Sınıf Biyoloji Soru Bankası Robert Yayınları",
+    publisher: "Robert Yayınları",
+    grade: 9,
+    examType: "TYT",
+    subject: "Biyoloji",
+    condition: "Tertemiz - İyi Durumda",
+    cover: "images/9-sinif-biyoloji-soru-bankasi-robert-koleji-yayinlari.jpg",
+    images: [],
+    description:
+      "Tamamı tertemiz. Cilt ve kapak sağlam.",
+    originalPrice: 52,
+    originalPriceLink: "https://www.kitapsec.com/Products/9-Sinif-Biyoloji-Soru-Bankasi-Robert-Koleji-Yayinlari-546424.html?srsltid=AfmBOooq1mwL_5ssGfn2ubbEpllSXCBzvlSKmgH83eoCHrjmTXidwcEg",
+    sellPrice: 40,
+    sold: false
+  },
+  {
+    id: "kitap-013",
+    title: "Yayın Denizi 9. Sınıf Biyoloji Pro Soru Bankası",
+    publisher: "Yayın Denizi",
+    grade: 9,
+    examType: "TYT",
+    subject: "Biyoloji",
+    condition: "Az kullanılmış - İyi Durumda",
+    cover: "images/9-sinif-biyoloji-yayindenizi-soru-bankasi.jpg",
+    images: [],
+    description:
+      "Yarısı çözülü. Cilt ve kapak sağlam.",
+    originalPrice: 199,
+    originalPriceLink: "https://www.kitapisler.com/yayin-denizi-9-sinif-biyoloji-pro-soru-bankasi_66591.html?srsltid=AfmBOorJtpghOLTr_R0KpQrrNwKR8KO_In_TQy7yWgUfY_RmXuSeVve9",
+    sellPrice: 80,
+    sold: false
+  },
+  {
+    id: "kitap-014",
+    title: "Biyotik Yayınları 9. Sınıf Biyoloji 25 x 11 Biyotik Tarama Testleri",
+    publisher: "Biyotik Yayınları",
+    grade: 9,
+    examType: "TYT",
+    subject: "Biyoloji",
+    condition: "Bir kısmı eksik - İyi Durumda",
+    cover: "images/biyotik-9-sinif-biyoloji-deneme.jpg",
+    images: [],
+    description:
+      "Sadece 5 tane denemesi kalmış. Tertemiz. Cilt ve kapak sağlam.",
+    originalPrice: 95,
+    originalPriceLink: "https://www.kitapisler.com/biyotik-yayinlari-9-sinif-biyoloji-25-x-11-biyotik-tarama-testleri_66604.html?srsltid=AfmBOoqfF4s9YqaIZnWFeaJw5cs7PHkOPC6WsCYr1LlZ-gMkFIOX2XOf",
+    sellPrice: 10,
+    sold: false
+  },
+  {
+    id: "kitap-015",
+    title: "Yayın Denizi 10x40 AYT Matematik Denemeleri",
+    publisher: "Yayın Denizi",
+    grade: "Genel",
+    examType: "AYT",
+    subject: "Matematik",
+    condition: "Tertemiz - İyi Durumda",
+    cover: "images/yayindenizi-6-adet-ayt-mat-deneme.jpg",
+    images: [],
+    description:
+      "Sadece 5 tane denemesi kalmış. Tertemiz. Cilt ve kapak sağlam.",
+    // İnternette satışı/linki bulunamadığı için orijinal fiyat gösterilmiyor:
+    originalPrice: null,
+    originalPriceLink: "",
+    sellPrice: 10,
     sold: false
   }
 ];

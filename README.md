@@ -41,6 +41,27 @@ ne işe yaradığı ayrıntılı yorum olarak yazıyor):
 }
 ```
 
+## Sepet ve WhatsApp'tan sipariş
+
+Ziyaretçiler beğendikleri kitapları "Sepete Ekle" ile sepetlerine ekleyip, sağ
+alttaki 🛒 **Sepet** butonundan sepetlerini görüp **"WhatsApp'tan Sipariş
+Ver"** butonuyla sana doğrudan WhatsApp üzerinden, seçtiği kitapların ve
+toplam tutarın yazılı olduğu hazır bir mesaj gönderebiliyor (ödeme/kargo
+kısmını sen mesajlaştıktan sonra ayarlarsın — statik bir sitede gerçek bir
+ödeme sistemi kurmak mümkün olmadığı için en pratik ve güvenilir yöntem bu).
+Sepet, ziyaretçinin tarayıcısında saklanır; sayfayı kapatıp açsa bile kaybolmaz.
+
+Mesajın **senin** WhatsApp'ına gitmesi için `js/data.js` dosyasının en üstündeki
+
+```js
+const SELLER_WHATSAPP_NUMBER = "905XXXXXXXXX";
+```
+
+satırını kendi numaranla değiştirmen gerekiyor. Numaranı başında ülke kodu
+(Türkiye için 90) olacak şekilde, boşluksuz ve `+` işaretsiz yaz. Örneğin
+telefon numaran `05XX XXX XX XX` ise, baştaki `0`'ı silip yerine `90` koyarak
+`"905XXXXXXXXX"` şeklinde yazman yeterli.
+
 Branş filtresi listedeki kitaplardan **otomatik** oluşturulur; yeni bir branş
 yazman yeterli, filtreye elle eklemene gerek yok.
 
