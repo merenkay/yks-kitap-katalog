@@ -40,6 +40,7 @@ const els = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   cacheElements();
+  initTheme();
   populateSubjectFilter();
   bindEvents();
   render();
@@ -49,7 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
 function cacheElements() {
   els.grid = document.getElementById("bookGrid");
   els.empty = document.getElementById("emptyState");
-  els.count = document.getElementById("resultCount");
+  els.statsBar = document.getElementById("statsBar");
+  els.themeToggle = document.getElementById("themeToggle");
 
   els.gradeFilter = document.getElementById("gradeFilter");
   els.examFilter = document.getElementById("examFilter");
@@ -172,6 +174,8 @@ function bindEvents() {
   });
   els.cartCopyBtn.addEventListener("click", copyOrderMessage);
 
+  els.themeToggle.addEventListener("click", toggleTheme);
+
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape" && e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     if (els.modal.classList.contains("open")) {
@@ -184,11 +188,26 @@ function bindEvents() {
   });
 }
 
+// "TYT-AYT" olarak işaretlenmiş bir kitap hem TYT hem AYT filtresinde
+// çıkmalı (ayrı bir "TYT+AYT" seçeneği açmadan) — bu yüzden eşleşme
+// sadece birebir değil, "TYT-AYT" için de geçerli.
+function matchesExamType(book, filterValue) {
+  if (filterValue === "all") return true;
+  return book.examType === filterValue || book.examType === "TYT-AYT";
+}
+
+// İndirim yüzdesi: orijinal fiyat bilinmiyorsa ya da indirim yoksa null döner.
+function getDiscountPercent(book) {
+  if (!book.originalPrice || book.originalPrice <= 0) return null;
+  if (book.sellPrice >= book.originalPrice) return null;
+  return Math.round((1 - book.sellPrice / book.originalPrice) * 100);
+}
+
 function getFilteredBooks() {
   let list = BOOKS.filter((book) => {
     if (state.hideSold && book.sold) return false;
     if (state.grade !== "all" && String(book.grade) !== state.grade) return false;
-    if (state.examType !== "all" && book.examType !== state.examType) return false;
+    if (!matchesExamType(book, state.examType)) return false;
     if (state.subject !== "all" && !subjectList(book.subject).includes(state.subject)) return false;
     if (state.search && !book.title.toLowerCase().includes(state.search)) return false;
     return true;
@@ -198,6 +217,8 @@ function getFilteredBooks() {
     list = list.slice().sort((a, b) => a.sellPrice - b.sellPrice);
   } else if (state.sort === "price-desc") {
     list = list.slice().sort((a, b) => b.sellPrice - a.sellPrice);
+  } else if (state.sort === "discount-desc") {
+    list = list.slice().sort((a, b) => (getDiscountPercent(b) ?? -1) - (getDiscountPercent(a) ?? -1));
   }
 
   return list;
@@ -207,12 +228,35 @@ function render() {
   const filtered = getFilteredBooks();
   els.grid.innerHTML = "";
 
-  els.count.textContent = `${filtered.length} kitap listeleniyor`;
+  renderStatsBar(filtered);
   els.empty.style.display = filtered.length === 0 ? "block" : "none";
 
   filtered.forEach((book) => {
     els.grid.appendChild(buildCard(book));
   });
+}
+
+function renderStatsBar(list) {
+  if (list.length === 0) {
+    els.statsBar.innerHTML = `<span class="stat-pill">0 kitap listeleniyor</span>`;
+    return;
+  }
+
+  const totalSell = list.reduce((sum, b) => sum + b.sellPrice, 0);
+  const discounts = list.map(getDiscountPercent).filter((d) => d !== null);
+  const avgDiscount = discounts.length
+    ? Math.round(discounts.reduce((sum, d) => sum + d, 0) / discounts.length)
+    : null;
+
+  els.statsBar.innerHTML = `
+    <span class="stat-pill">📚 <strong>${list.length}</strong> kitap listeleniyor</span>
+    <span class="stat-pill">💰 Toplam: <strong>${totalSell} TL</strong></span>
+    ${
+      avgDiscount !== null
+        ? `<span class="stat-pill stat-pill--discount">🎉 Ortalama İndirim: <strong>%${avgDiscount}</strong></span>`
+        : ""
+    }
+  `;
 }
 
 function buildCard(book) {
@@ -224,12 +268,18 @@ function buildCard(book) {
   card.dataset.bookId = book.id;
 
   const gradeLabel = book.grade === "Genel" ? "Genel" : `${book.grade}. Sınıf`;
+  const discount = getDiscountPercent(book);
 
   card.innerHTML = `
     <div class="card__imgwrap">
       <img class="card__img" src="${escapeAttr(book.cover)}" alt="${escapeAttr(book.title)} kapak görseli"
            loading="lazy" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
       ${book.sold ? '<span class="ribbon">SATILDI</span>' : ""}
+      ${
+        !book.sold && discount !== null
+          ? `<span class="ribbon ribbon--discount">%${discount} İndirim</span>`
+          : ""
+      }
     </div>
     <div class="card__body">
       <div class="badges">
@@ -253,6 +303,13 @@ function buildCard(book) {
             : ""
         }
         <span class="price price--sell">${book.sellPrice} TL</span>
+        ${
+          discount !== null
+            ? `<span class="discount-badge${discount >= 50 ? " discount-badge--hot" : ""}">${
+                discount >= 50 ? "🔥 " : ""
+              }-%${discount}</span>`
+            : ""
+        }
       </div>
       <div class="card__actions">
         <button class="btn btn--detail" type="button">Detayları Gör</button>
@@ -324,7 +381,15 @@ function openModal(book) {
       ? `Orijinal Fiyat: <a href="${escapeAttr(book.originalPriceLink)}" target="_blank" rel="noopener noreferrer">${book.originalPrice} TL ↗</a>`
       : `Orijinal Fiyat: ${book.originalPrice} TL`
     : "";
-  els.modalSellPrice.textContent = `İkinci El Fiyatım: ${book.sellPrice} TL`;
+
+  const modalDiscount = getDiscountPercent(book);
+  els.modalSellPrice.innerHTML = `İkinci El Fiyatım: ${book.sellPrice} TL${
+    modalDiscount !== null
+      ? ` <span class="discount-badge${modalDiscount >= 50 ? " discount-badge--hot" : ""}">${
+          modalDiscount >= 50 ? "🔥 " : ""
+        }-%${modalDiscount}</span>`
+      : ""
+  }`;
 
   if (book.sold) {
     els.modalAddToCart.style.display = "none";
@@ -511,6 +576,27 @@ async function copyOrderMessage() {
   setTimeout(() => {
     els.cartCopyBtn.textContent = originalLabel;
   }, 1500);
+}
+
+// ---- Tema (açık/koyu) ----
+const THEME_STORAGE_KEY = "yksKatalogTema";
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_STORAGE_KEY);
+  const theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  const next = current === "dark" ? "light" : "dark";
+  localStorage.setItem(THEME_STORAGE_KEY, next);
+  applyTheme(next);
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  els.themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
 }
 
 // ---- Yardımcılar ----

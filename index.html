@@ -10,6 +10,7 @@
 <body>
 
 <header class="site-header">
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Açık/koyu tema değiştir">🌙</button>
   <h1>📚 YKS Kitap Kataloğum</h1>
   <p>Kullandığım TYT / AYT kaynak kitaplarının ikinci el satış listesi</p>
 </header>
@@ -33,17 +34,17 @@
     <option value="all">TYT / AYT (Tümü)</option>
     <option value="TYT">TYT</option>
     <option value="AYT">AYT</option>
-    <option value="TYT-AYT">TYT + AYT (Genel)</option>
   </select>
 
   <select id="subjectFilter" aria-label="Branş filtresi">
     <option value="all">Tüm Branşlar</option>
   </select>
 
-  <select id="sortFilter" aria-label="Fiyata göre sırala">
+  <select id="sortFilter" aria-label="Sıralama">
     <option value="default">Sıralama: Varsayılan</option>
     <option value="price-asc">Fiyat: Artan</option>
     <option value="price-desc">Fiyat: Azalan</option>
+    <option value="discount-desc">İndirim: Yüksekten Düşüğe</option>
   </select>
 
   <input type="text" id="searchInput" class="search-box" placeholder="Kitap adında ara...">
@@ -54,9 +55,9 @@
   </label>
 
   <button class="btn btn--reset" id="resetFilters" type="button">Filtreleri Temizle</button>
-
-  <span class="result-count" id="resultCount"></span>
 </div>
+
+<div class="stats-bar" id="statsBar"></div>
 
 <main>
   <div class="grid" id="bookGrid"></div>

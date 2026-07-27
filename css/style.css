@@ -12,6 +12,7 @@
   --sell-price: #1f9254;
   --original-price: #8a92a6;
   --danger: #e03131;
+  --discount: #e8590c;
   --radius: 14px;
   --shadow: 0 6px 20px rgba(31, 41, 66, 0.08);
 }
@@ -25,6 +26,25 @@
     --border: #2b3042;
     --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   }
+}
+
+/* Kullanıcı sağ üstteki düğmeyle temayı elle seçtiğinde sistem tercihini geçersiz kılar */
+:root[data-theme="light"] {
+  --bg: #f3f5fb;
+  --surface: #ffffff;
+  --text: #1c2233;
+  --text-muted: #5b6478;
+  --border: #e3e7f1;
+  --shadow: 0 6px 20px rgba(31, 41, 66, 0.08);
+}
+
+:root[data-theme="dark"] {
+  --bg: #14171f;
+  --surface: #1d2130;
+  --text: #eef0f6;
+  --text-muted: #9aa2b6;
+  --border: #2b3042;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -44,10 +64,30 @@ a {
 }
 
 .site-header {
+  position: relative;
   background: linear-gradient(120deg, var(--primary), var(--accent-both));
   color: #fff;
   padding: 2.2rem 1.5rem 1.6rem;
   text-align: center;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .site-header h1 {
@@ -356,11 +396,31 @@ a {
   pointer-events: none;
 }
 
-.result-count {
-  margin-left: auto;
-  font-size: 0.85rem;
+.stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.9rem 1.5rem;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.stat-pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   white-space: nowrap;
+}
+
+.stat-pill strong {
+  color: var(--text);
+}
+
+.stat-pill--discount strong {
+  color: var(--discount);
 }
 
 main {
@@ -517,6 +577,26 @@ main {
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--sell-price);
+}
+
+.discount-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--discount);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+}
+
+.discount-badge--hot {
+  background: var(--danger);
+}
+
+.ribbon--discount {
+  left: 12px;
+  right: auto;
+  transform: rotate(-35deg);
+  background: var(--discount);
 }
 
 .empty-state {
