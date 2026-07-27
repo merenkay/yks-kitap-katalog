@@ -1,0 +1,14 @@
+Kitap kapak ve diğer görsellerini bu klasöre koyabilirsin.
+
+Örnek kullanım:
+1) Bu klasöre "tyt-matematik.jpg" gibi bir dosya at.
+2) js/data.js içinde ilgili kitabın "cover" alanına "images/tyt-matematik.jpg" yaz.
+
+Alternatif: Dosya yüklemek istemiyorsan, internetten (kendi telefonundan Google
+Drive/Imgur gibi bir yere yüklediğin) bir görselin doğrudan linkini de
+"cover" alanına yazabilirsin, ikisi de çalışır.
+
+Görsel bulunamazsa veya link bozuksa site otomatik olarak yerine bir
+placeholder (yer tutucu) görsel gösterir, site bozulmaz.
+
+Önerilen boyut: dikey (portre) fotoğraflar, ~3:4 oranında (örn. 900x1200 px).
