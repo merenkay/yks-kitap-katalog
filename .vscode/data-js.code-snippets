@@ -1,0 +1,26 @@
+{
+  "Yeni Kitap Objesi": {
+    "scope": "javascript",
+    "prefix": "kitapobj",
+    "body": [
+      "{",
+      "  title: \"$1\",",
+      "  publisher: \"$2\",",
+      "  grade: ${3|9,10,11,12,\"Genel\"|},",
+      "  examType: \"${4|TYT,AYT,TYT-AYT|}\",",
+      "  subject: \"$5\",",
+      "  condition: \"${6|Sıfır (Hiç Kullanılmamış),Az Kullanılmış - Temiz,Kullanılmış - İyi Durumda,Kullanılmış - Bazı Sayfalar Yazılı|}\",",
+      "  cover: \"images/$7.jpg\",",
+      "  images: [],",
+      "  description:",
+      "    \"$8\",",
+      "  originalPrice: ${9:null},",
+      "  originalPriceLink: \"$10\",",
+      "  sellPrice: ${11:0},",
+      "  sold: false",
+      "},",
+      "$0"
+    ],
+    "description": "js/data.js BOOKS listesine boş alanlarla yeni bir kitap objesi ekler (id yazmana gerek yok, otomatik üretiliyor)"
+  }
+}
