@@ -3,6 +3,17 @@ const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
+const sharp = require('sharp');
+
+// Netlify'a yüklenen görsellerin boyutu küçük kalsın diye her fotoğraf
+// kaydedilir kaydedilmez otomatik olarak bu ölçülere sıkıştırılır.
+// (Sıkıştırılmamış telefon fotoğrafları 2-3 MB'tan başlıyordu; bu site
+// mobil veride açılırken sayfayı ağırlaştırıp "açılmıyormuş" hissi
+// veriyordu. Kart görselleri ~230px genişlikte gösterildiği için 1100px
+// kenar uzunluğu ve %76 kalite, gözle fark edilir bir kayıp olmadan
+// dosyayı ~25 kat küçültüyor.)
+const MAX_IMAGE_DIMENSION = 1100;
+const IMAGE_QUALITY = 76;
 
 const app = express();
 app.use(cors());
@@ -166,13 +177,39 @@ app.get('/', (req, res) => {
 });
 
 // Yükleme Endpoint'i
-app.post('/upload', upload.single('photo'), (req, res) => {
+app.post('/upload', upload.single('photo'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, message: 'Dosya yüklenemedi' });
     }
 
     const usageInfo = req.query.usage || 'Belirtilmedi';
     const baseName = req.finalBaseName;
+
+    // Fotoğrafı her zaman .jpg olarak sıkıştırıp yeniden kaydet (EXIF
+    // dönüşü piksellere gömülür, konum/cihaz bilgisi de bu sırada silinir).
+    const finalImagePath = path.join(uploadDir, `${baseName}.jpg`);
+    const tempPath = req.file.path + '.tmp';
+    try {
+        await sharp(req.file.path)
+            .rotate()
+            .resize({
+                width: MAX_IMAGE_DIMENSION,
+                height: MAX_IMAGE_DIMENSION,
+                fit: 'inside',
+                withoutEnlargement: true
+            })
+            .jpeg({ quality: IMAGE_QUALITY, progressive: true })
+            .toFile(tempPath);
+
+        if (req.file.path !== finalImagePath && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+        fs.renameSync(tempPath, finalImagePath);
+        req.file.filename = `${baseName}.jpg`;
+    } catch (err) {
+        console.error('Görsel sıkıştırma hatası:', err);
+    }
+
     const txtFilePath = path.join(uploadDir, `${baseName}.txt`);
 
     // .txt Dosyasının İçeriği

@@ -60,6 +60,21 @@ bile kaybolmaz.
 Branş filtresi listedeki kitaplardan **otomatik** oluşturulur; yeni bir branş
 yazman yeterli, filtreye elle eklemene gerek yok.
 
+## Görsel boyutu (mobil veride yavaş/açılmıyor gibi görünmesin diye)
+
+Telefon fotoğrafları genelde 2-3 MB'tan başlıyor; kartlarda görsel sadece
+~230px genişlikte gösterildiği için bu boyut tamamen gereksiz — ev Wi-Fi'sinde
+fark edilmez ama mobil veride sayfayı ağırlaştırıp "açılmıyormuş" hissi
+verebilir. Bu yüzden:
+
+- `server.js` (telefon fotoğraf yükleme aracı) artık her fotoğrafı otomatik
+  olarak en fazla 1100px kenar uzunluğuna küçültüp sıkıştırıyor (~%95 daha
+  küçük dosya, gözle fark edilir kalite kaybı olmadan). Telefondan bu araçla
+  yüklediğin her fotoğraf zaten optimize halde `images/` klasörüne düşer.
+- `images/` klasörüne **elle** (server.js kullanmadan) bir fotoğraf
+  kopyalıyorsan, mümkünse önce kendi telefonunda/bilgisayarında ~1000-1200px
+  genişliğe küçültülmüş halini koy — aksi halde site yine yavaşlar.
+
 ## Bilgisayarında test etme
 
 `index.html` dosyasına çift tıklayıp tarayıcıda açman yeterli — hiçbir kurulum

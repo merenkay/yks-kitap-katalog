@@ -120,7 +120,7 @@ const BOOKS = [
     originalPrice: 449,
     originalPriceLink: "https://www.kitapisler.com/orbital-yayinlari-9-sinif-kimya-soru-bankasi_102167.html?srsltid=AfmBOoraFGtPblzxfBC0J3SOXIEChQvSaStrSC-4j-VEKz9PsDXSttsj",
     sellPrice: 150,
-    sold: true
+    sold: false
   },
   {
     id: "kitap-005",
