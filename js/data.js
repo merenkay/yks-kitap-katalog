@@ -5,7 +5,15 @@
   bloğu eklemen yeterli. Bir kitabı silmek için ilgili bloğu kaldır.
 
   Alan açıklamaları:
-  - id            : Benzersiz bir metin/numara (ör: "kitap-009"). Her kitapta farklı olmalı.
+  - id            : ARTIK OPSİYONEL — yazmasan da olur, tamamen silebilirsin.
+                    Boş bırakırsan kitabın adından otomatik ve kalıcı bir id
+                    üretilir (aynı başlık her zaman aynı id'yi verir, kitap
+                    sırası değişse/araya yeni kitap eklesen bile bozulmaz).
+                    Sepet ve "bu kitabı paylaş" linkleri bu id'yi kullanıyor,
+                    bu yüzden bir kitabı ekledikten sonra title'ını değiştirirsen
+                    o kitaba önceden paylaşılmış linkler/sepetler geçersiz olur
+                    (siteyi bozmaz, sadece o eski link artık o kitabı açmaz).
+                    İstersen yine de elle kendi id'ini de yazabilirsin.
   - title         : Kitabın adı.
   - publisher     : Yayınevi (opsiyonel, boş bırakılabilir "").
   - grade         : 9, 10, 11, 12 veya birden fazla sınıfa hitap ediyorsa "Genel".
@@ -55,7 +63,6 @@
 
 const BOOKS = [
   {
-    id: "kitap-001",
     title: "0`dan 10`a Kimya Konu Anlatımlı Soru Bankası Tonguç Akademi",
     publisher: "Tonguç Akademi",
     grade: 10,
@@ -72,7 +79,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-002",
     title: "Çap Yayınları 10. Sınıf Fen Lisesi Kimya Soru Bankası",
     publisher: "Çap Yayınları",
     grade: 10,
@@ -89,7 +95,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-003",
     title: "0 dan 9 a Kimya Konu Anlatımlı Soru Bankası Tonguç Akademi",
     publisher: "Tonguç Akademi",
     grade: 9,
@@ -106,7 +111,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-004",
     title: "Orbital Yayınları 9. Sınıf Kimya Soru Bankası",
     publisher: "Orbital Yayınları",
     grade: 9,
@@ -123,7 +127,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-005",
     title: "ENS Yayıncılık 10. Sınıf Biyoloji Defter Kitap",
     publisher: "ENS Yayıncılık",
     grade: 10,
@@ -140,7 +143,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-006",
     title: "Palme 9. Sınıf Kimya Soru Kitabı Palme Yayınları",
     publisher: "Palme Yayınları",
     grade: 9,
@@ -157,7 +159,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-007",
     title: "Bilgi Sarmal Yayınları TYT Fizik 40 x 7 Branş Denemeleri",
     publisher: "Bilgi Sarmal Yayınları",
     grade: "Genel",
@@ -174,7 +175,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-008",
     title: "Limit Yayınları TYT FKB 3 Ders + 4 Test = 7 Gün",
     publisher: "Limit Yayınları",
     grade: 12,
@@ -191,7 +191,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-009",
     title: "Kafa Dengi TYT Fizik Temel ve Orta Düzey Soru Bankası",
     publisher: "Kafa Dengi",
     grade: "Genel",
@@ -208,7 +207,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-010",
     title: "TYT AYT Fizik Son 20 Yıl Konularına Göre Çıkmış Sorular ve Çözümleri A Yayınları",
     publisher: "A Yayınları",
     grade: "Genel",
@@ -225,7 +223,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-011",
     title: "10. Sınıf Tarih Özet Pano Yayınları",
     publisher: "Pano Yayınları",
     grade: 10,
@@ -242,7 +239,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-012",
     title: "9. Sınıf Biyoloji Soru Bankası Robert Yayınları",
     publisher: "Robert Yayınları",
     grade: 9,
@@ -259,7 +255,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-013",
     title: "Yayın Denizi 9. Sınıf Biyoloji Pro Soru Bankası",
     publisher: "Yayın Denizi",
     grade: 9,
@@ -276,7 +271,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-014",
     title: "Biyotik Yayınları 9. Sınıf Biyoloji 25 x 11 Biyotik Tarama Testleri",
     publisher: "Biyotik Yayınları",
     grade: 9,
@@ -293,7 +287,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-015",
     title: "Yayın Denizi 10x40 AYT Matematik Denemeleri",
     publisher: "Yayın Denizi",
     grade: "Genel",
@@ -310,7 +303,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-016",
     title: "Bilgi Sarmal 9. Sınıf Matematik Soru Bankası",
     publisher: "Bilgi Sarmal Yayınları",
     grade: 9,
@@ -327,7 +319,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-017",
     title: "9. Sınıf Matematik Soru Kütüphanesi PRF Paraf Yayınları Kampanyalı",
     publisher: "Paraf Yayınları",
     grade: 9,
@@ -344,7 +335,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-018",
     title: "Bilgi Sarmal 10. Sınıf Matematik Soru Bankası",
     publisher: "Bilgi Sarmal Yayınları",
     grade: 10,
@@ -361,7 +351,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-019",
     title: "Yayın Denizi Yayınları 9.Sınıf Tek Serisi Video Çözümlü Fizik Soru Bankası",
     publisher: "Yayın Denizi",
     grade: 9,
@@ -378,7 +367,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-020",
     title: "9. Sınıf Fen Lisesi Fizik Soru Bankası Çap Yayınları",
     publisher: "Çap Yayınları",
     grade: 9,
@@ -395,7 +383,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-021",
     title: "Bilgi Sarmal 10. Sınıf Fizik Soru Bankası",
     publisher: "Bilgi Sarmal Yayınları",
     grade: 10,
@@ -412,7 +399,6 @@ const BOOKS = [
     sold: false
   },
   {
-    id: "kitap-022",
     title: "Orijinal Yayınları TYT AYT Geometri Soru Bankası",
     publisher: "Orijinal Yayınları",
     grade: "Genel",
@@ -427,5 +413,5 @@ const BOOKS = [
     originalPriceLink: "https://www.kitapisler.com/orijinal-yayinlari-tyt-ayt-geometri-soru-bankasi_84329.html?srsltid=AfmBOoo-gcj4oTlY3qErG3BMED9dPVAKcQMjnWrdkcRIPIEwTwKCYtOs",
     sellPrice: 180,
     sold: false
-  },
+  }
 ];

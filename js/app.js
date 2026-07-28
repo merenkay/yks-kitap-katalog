@@ -5,6 +5,37 @@
   js/data.js dosyasına bak.
 */
 
+// js/data.js içinde "id" alanı boş bırakılan kitaplara, başlıklarından
+// otomatik ve kalıcı bir id üretilir (aynı başlık = her zaman aynı id).
+// Böylece yeni kitap eklerken id uydurup takip etmene gerek kalmıyor.
+// data.js her zaman bu dosyadan önce yüklendiği için BOOKS burada hazırdır.
+(function assignMissingBookIds() {
+  const usedIds = new Set();
+  BOOKS.forEach((book) => {
+    let id = book.id || slugify(book.title);
+    let suffix = 2;
+    while (usedIds.has(id)) {
+      id = `${book.id || slugify(book.title)}-${suffix++}`;
+    }
+    book.id = id;
+    usedIds.add(id);
+  });
+})();
+
+function slugify(text) {
+  const turkishMap = {
+    ç: "c", ğ: "g", ı: "i", ö: "o", ş: "s", ü: "u",
+    Ç: "c", Ğ: "g", İ: "i", I: "i", Ö: "o", Ş: "s", Ü: "u"
+  };
+  return String(text)
+    .split("")
+    .map((ch) => turkishMap[ch] || ch)
+    .join("")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "kitap";
+}
+
 // Kapak görseli bulunamazsa veya link bozuksa gösterilecek yedek görsel (SVG, data URI)
 const PLACEHOLDER_IMG =
   "data:image/svg+xml;utf8," +
