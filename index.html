@@ -77,7 +77,8 @@
 </main>
 
 <footer>
-  Bu katalog kişisel ikinci el kitap satışları içindir. Fiyatlar ve stok durumu değişebilir.
+  <p>Bu katalog kişisel ikinci el kitap satışları içindir. Fiyatlar ve stok durumu değişebilir.</p>
+  <p id="soldStat"></p>
 </footer>
 
 <!-- Detay Modalı -->
@@ -101,7 +102,10 @@
           <p class="modal__original" id="modalOriginalPrice"></p>
           <p class="modal__sell" id="modalSellPrice"></p>
         </div>
-        <button class="btn btn--cart" id="modalAddToCart" type="button">Sepete Ekle</button>
+        <div class="modal__actions">
+          <button class="btn btn--cart" id="modalAddToCart" type="button">Sepete Ekle</button>
+          <button class="btn btn--share" id="modalShareBtn" type="button" title="Bu kitabın linkini WhatsApp'ta paylaş">📤 Paylaş</button>
+        </div>
       </div>
     </div>
   </div>

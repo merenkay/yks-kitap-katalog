@@ -224,8 +224,31 @@ a {
   cursor: not-allowed;
 }
 
-.modal__details .btn--cart {
-  width: 100%;
+.modal__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modal__actions .btn--cart {
+  flex: 2;
+}
+
+.btn--share {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.btn--share:hover {
+  background: var(--border);
+}
+
+.btn--share.is-copied {
+  background: var(--sell-price);
+  border-color: var(--sell-price);
+  color: #fff;
 }
 
 /* ---- Sepet FAB ---- */
@@ -460,8 +483,58 @@ main {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--card-min-width, 230px), 1fr));
+  grid-template-columns: repeat(var(--grid-cols, 2), 1fr);
   gap: 1.2rem;
+}
+
+/* Kart boyutu seçimi, ekran genişliğinden bağımsız olarak her zaman görünür
+   bir fark yaratsın diye sütun SAYISINI doğrudan belirliyoruz (sadece minmax
+   genişliğine güvenmek dar telefon ekranlarında hep tek sütuna düşüp
+   "Orta"/"Büyük" arasındaki farkı görünmez kılıyordu). */
+:root[data-grid-size="small"] {
+  --grid-cols: 3;
+}
+:root[data-grid-size="medium"] {
+  --grid-cols: 2;
+}
+:root[data-grid-size="large"] {
+  --grid-cols: 1;
+}
+
+@media (min-width: 640px) {
+  :root[data-grid-size="small"] {
+    --grid-cols: 4;
+  }
+  :root[data-grid-size="medium"] {
+    --grid-cols: 3;
+  }
+  :root[data-grid-size="large"] {
+    --grid-cols: 2;
+  }
+}
+
+@media (min-width: 1000px) {
+  :root[data-grid-size="small"] {
+    --grid-cols: 6;
+  }
+  :root[data-grid-size="medium"] {
+    --grid-cols: 4;
+  }
+  :root[data-grid-size="large"] {
+    --grid-cols: 3;
+  }
+}
+
+@media (min-width: 1300px) {
+  :root[data-grid-size="small"] {
+    --grid-cols: 7;
+  }
+  :root[data-grid-size="medium"] {
+    --grid-cols: 5;
+  }
+  :root[data-grid-size="large"] {
+    --grid-cols: 4;
+  }
 }
 
 .grid-size {
@@ -670,6 +743,15 @@ footer {
   padding: 2rem 1rem 2.5rem;
   color: var(--text-muted);
   font-size: 0.8rem;
+}
+
+footer p {
+  margin: 0.3rem 0;
+}
+
+#soldStat {
+  font-weight: 700;
+  color: var(--sell-price);
 }
 
 /* ---- Modal ---- */

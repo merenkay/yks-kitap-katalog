@@ -44,9 +44,12 @@ document.addEventListener("DOMContentLoaded", () => {
   initFiltersToggle();
   initGridSize();
   populateSubjectFilter();
+  populateFilterCounts();
   bindEvents();
   render();
   updateCartUI();
+  renderSoldStat();
+  openBookFromUrlHash();
 });
 
 function cacheElements() {
@@ -82,6 +85,8 @@ function cacheElements() {
   els.modalOriginalPrice = document.getElementById("modalOriginalPrice");
   els.modalSellPrice = document.getElementById("modalSellPrice");
   els.modalAddToCart = document.getElementById("modalAddToCart");
+  els.modalShareBtn = document.getElementById("modalShareBtn");
+  els.soldStat = document.getElementById("soldStat");
 
   els.cartFab = document.getElementById("cartFab");
   els.cartBadge = document.getElementById("cartBadge");
@@ -112,6 +117,30 @@ function populateSubjectFilter() {
     opt.value = subject;
     opt.textContent = subject;
     els.subjectFilter.appendChild(opt);
+  });
+}
+
+// Filtre seçeneklerinin yanına kaç kitap olduğunu yazar (ör. "Kimya (5)"),
+// satılmış kitaplar sayılmaz. Sayılar sabittir, filtre değiştikçe güncellenmez
+// (basitlik için) — kataloğa göz atarken hangi kategoride ne kadar seçenek
+// olduğu hakkında fikir vermesi yeterli.
+function populateFilterCounts() {
+  const active = BOOKS.filter((b) => !b.sold);
+
+  annotateOptionCounts(els.gradeFilter, (value) =>
+    value === "all" ? active.length : active.filter((b) => String(b.grade) === value).length
+  );
+  annotateOptionCounts(els.examFilter, (value) =>
+    value === "all" ? active.length : active.filter((b) => matchesExamType(b, value)).length
+  );
+  annotateOptionCounts(els.subjectFilter, (value) =>
+    value === "all" ? active.length : active.filter((b) => subjectList(b.subject).includes(value)).length
+  );
+}
+
+function annotateOptionCounts(selectEl, counterFn) {
+  Array.from(selectEl.options).forEach((opt) => {
+    opt.textContent = `${opt.textContent} (${counterFn(opt.value)})`;
   });
 }
 
@@ -165,6 +194,7 @@ function bindEvents() {
   els.modalAddToCart.addEventListener("click", () => {
     if (currentModalBook) toggleCartItem(currentModalBook);
   });
+  els.modalShareBtn.addEventListener("click", shareSingleBook);
 
   els.cartFab.addEventListener("click", openCartModal);
   els.cartModalClose.addEventListener("click", closeCartModal);
@@ -415,6 +445,16 @@ function openModal(book) {
 
   els.modal.classList.add("open");
   document.body.classList.add("modal-open");
+
+  // Bu kitaba doğrudan link verilebilsin diye adres çubuğunu güncelle
+  // (yeni bir geçmiş kaydı eklemeden, geri tuşu davranışını bozmasın).
+  // index.html'i dosya olarak (file://) açarak test ederken bazı tarayıcılar
+  // history API'sini engelleyebiliyor, bu yüzden hataya karşı korumalı.
+  try {
+    history.replaceState(null, "", `#${book.id}`);
+  } catch {
+    /* file:// üzerinden test edilirken yok sayılır */
+  }
 }
 
 function renderGallery() {
@@ -451,6 +491,29 @@ function stepGallery(delta) {
 function closeModal() {
   els.modal.classList.remove("open");
   document.body.classList.remove("modal-open");
+  try {
+    history.replaceState(null, "", location.pathname + location.search);
+  } catch {
+    /* file:// üzerinden test edilirken yok sayılır */
+  }
+}
+
+// Sayfa "sitem.com/#kitap-005" gibi bir linkle açıldıysa, o kitabın
+// detayını otomatik göster (tek kitap paylaşım linkinin çalışması için).
+function openBookFromUrlHash() {
+  const id = location.hash.replace("#", "");
+  if (!id) return;
+  const book = BOOKS.find((b) => b.id === id);
+  if (book) openModal(book);
+}
+
+function shareSingleBook() {
+  if (!currentModalBook) return;
+  const book = currentModalBook;
+  const url = `${location.origin}${location.pathname}#${book.id}`;
+  const lines = [`${book.title} - ${book.sellPrice} TL`, "", url];
+  const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(lines.join("\n"))}`;
+  window.open(shareUrl, "_blank", "noopener,noreferrer");
 }
 
 // ---- Sepet ----
@@ -635,20 +698,27 @@ function setFiltersPanelState(open) {
 
 // ---- Kart görünüm boyutu (kaç kitap aynı anda görünsün) ----
 const GRID_SIZE_STORAGE_KEY = "yksKatalogGorunumBoyutu";
-const GRID_SIZE_PX = { small: "170px", medium: "230px", large: "320px" };
+const GRID_SIZES = ["small", "medium", "large"];
 
 function initGridSize() {
   const saved = localStorage.getItem(GRID_SIZE_STORAGE_KEY);
-  setGridSize(GRID_SIZE_PX[saved] ? saved : "medium");
+  setGridSize(GRID_SIZES.includes(saved) ? saved : "medium");
 }
 
 function setGridSize(size) {
-  if (!GRID_SIZE_PX[size]) return;
-  document.documentElement.style.setProperty("--card-min-width", GRID_SIZE_PX[size]);
+  if (!GRID_SIZES.includes(size)) return;
+  // Sütun sayısı data-grid-size'a göre css/style.css içindeki medya
+  // sorgularında belirleniyor; böylece mobilde de gerçek bir fark oluyor.
+  document.documentElement.dataset.gridSize = size;
   localStorage.setItem(GRID_SIZE_STORAGE_KEY, size);
   els.gridSizeButtons.forEach((btn) => {
     btn.classList.toggle("is-active", btn.dataset.size === size);
   });
+}
+
+function renderSoldStat() {
+  const soldCount = BOOKS.filter((b) => b.sold).length;
+  els.soldStat.textContent = soldCount > 0 ? `🎉 Şimdiye kadar bu katalogdan ${soldCount} kitap satıldı` : "";
 }
 
 // ---- Yardımcılar ----
