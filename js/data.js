@@ -413,5 +413,38 @@ const BOOKS = [
     originalPriceLink: "https://www.kitapisler.com/orijinal-yayinlari-tyt-ayt-geometri-soru-bankasi_84329.html?srsltid=AfmBOoo-gcj4oTlY3qErG3BMED9dPVAKcQMjnWrdkcRIPIEwTwKCYtOs",
     sellPrice: 180,
     sold: false
-  }
+  },
+  {
+    title: "",
+    publisher: "",
+    grade: "",
+    examType: "TYT-AYT",
+    subject: "",
+    condition: "Az kullanılmış - İyi Durumda",
+    cover: "images/",
+    images: [],
+    description:
+      ". Cilt ve kapak sağlam.",
+    originalPrice: 0,
+    originalPriceLink: "",
+    sellPrice: 0,
+    sold: false
+  },
+  {
+    title: "",
+    publisher: "",
+    grade: "",
+    examType: "TYT-AYT",
+    subject: "",
+    condition: "Az kullanılmış - İyi Durumda",
+    cover: "images/",
+    images: [],
+    description:
+      ". Cilt ve kapak sağlam.",
+    originalPrice: 0,
+    originalPriceLink: "",
+    sellPrice: 0,
+    sold: false
+  },
+  ko
 ];

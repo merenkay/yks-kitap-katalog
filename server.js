@@ -201,13 +201,38 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
             .jpeg({ quality: IMAGE_QUALITY, progressive: true })
             .toFile(tempPath);
 
+        // Orijinal yükleme genelde zaten ".jpg" uzantılı olduğu için
+        // req.file.path çoğu zaman finalImagePath ile AYNI dosyadır. Bu
+        // durumda hedefte eski (sıkıştırılmamış) dosya dururken rename
+        // yapmaya çalışmak Windows'ta hata veriyordu (Windows, POSIX'in
+        // aksine hedef doluyken rename'e izin vermiyor) — bu yüzden hem
+        // sıkıştırma hem yer değiştirme başarısız kalıp hem orijinal
+        // sıkıştırılmamış dosya hem de yarım kalan .tmp dosyası ortada
+        // kalıyordu. Rename'den önce hedefi temizleyerek bunu düzeltiyoruz.
+        if (fs.existsSync(finalImagePath)) {
+            fs.unlinkSync(finalImagePath);
+        }
+        fs.renameSync(tempPath, finalImagePath);
+
+        // Orijinal yükleme farklı bir uzantıdaysa (ör. .png/.heic) o dosya
+        // hâlâ diskte durur, onu da temizleyelim.
         if (req.file.path !== finalImagePath && fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
         }
-        fs.renameSync(tempPath, finalImagePath);
+
         req.file.filename = `${baseName}.jpg`;
     } catch (err) {
         console.error('Görsel sıkıştırma hatası:', err);
+        // Sıkıştırma/taşıma başarısız olduysa yarım kalan .tmp dosyasını
+        // temizle; orijinal yükleme (sıkıştırılmamış da olsa) images/
+        // klasöründe kalsın, en azından fotoğraf kaybolmasın.
+        if (fs.existsSync(tempPath)) {
+            try {
+                fs.unlinkSync(tempPath);
+            } catch {
+                /* yoksay */
+            }
+        }
     }
 
     const txtFilePath = path.join(uploadDir, `${baseName}.txt`);
