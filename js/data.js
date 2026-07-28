@@ -204,7 +204,7 @@ const BOOKS = [
       "Sadece dalgalar çözülmüş, tertemiz. Cilt ve kapak sağlam.",
     originalPrice: 525,
     originalPriceLink: "https://www.kitapisler.com/kafa-dengi-yayinlari-tyt-fizik-temel-ve-orta-duzey-soru-bankasi_53764.html",
-    sellPrice: 200,
+    sellPrice: 180,
     sold: false
   },
   {

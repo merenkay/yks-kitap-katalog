@@ -101,10 +101,35 @@ a {
   font-size: 0.95rem;
 }
 
-.filters {
+.filters-toggle {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 21;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.9rem 1.5rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.filters-toggle__chevron {
+  transition: transform 0.2s ease;
+}
+
+.filters-toggle[aria-expanded="false"] .filters-toggle__chevron {
+  transform: rotate(-90deg);
+}
+
+.filters {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 1rem 1.5rem;
@@ -113,6 +138,10 @@ a {
   gap: 0.7rem;
   align-items: center;
   box-shadow: var(--shadow);
+}
+
+.filters.is-collapsed {
+  display: none;
 }
 
 .filters select,
@@ -431,8 +460,38 @@ main {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--card-min-width, 230px), 1fr));
   gap: 1.2rem;
+}
+
+.grid-size {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.grid-size__label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-right: 0.15rem;
+}
+
+.grid-size__btn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.grid-size__btn.is-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }
 
 .card {

@@ -20,7 +20,12 @@
   <span class="cart-fab__badge" id="cartBadge" hidden>0</span>
 </button>
 
-<div class="filters">
+<button class="filters-toggle" id="filtersToggle" type="button" aria-expanded="true" aria-controls="filtersPanel">
+  <span>🔍 Filtrele ve Sırala</span>
+  <span class="filters-toggle__chevron" id="filtersChevron">▾</span>
+</button>
+
+<div class="filters" id="filtersPanel">
   <select id="gradeFilter" aria-label="Sınıf filtresi">
     <option value="all">Tüm Sınıflar</option>
     <option value="9">9. Sınıf</option>
@@ -55,6 +60,13 @@
   </label>
 
   <button class="btn btn--reset" id="resetFilters" type="button">Filtreleri Temizle</button>
+
+  <div class="grid-size" role="group" aria-label="Kart görünüm boyutu">
+    <span class="grid-size__label">Görünüm:</span>
+    <button type="button" class="grid-size__btn" data-size="small">Küçük</button>
+    <button type="button" class="grid-size__btn" data-size="medium">Orta</button>
+    <button type="button" class="grid-size__btn" data-size="large">Büyük</button>
+  </div>
 </div>
 
 <div class="stats-bar" id="statsBar"></div>

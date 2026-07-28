@@ -41,6 +41,8 @@ const els = {};
 document.addEventListener("DOMContentLoaded", () => {
   cacheElements();
   initTheme();
+  initFiltersToggle();
+  initGridSize();
   populateSubjectFilter();
   bindEvents();
   render();
@@ -52,6 +54,11 @@ function cacheElements() {
   els.empty = document.getElementById("emptyState");
   els.statsBar = document.getElementById("statsBar");
   els.themeToggle = document.getElementById("themeToggle");
+
+  els.filtersToggle = document.getElementById("filtersToggle");
+  els.filtersChevron = document.getElementById("filtersChevron");
+  els.filtersPanel = document.getElementById("filtersPanel");
+  els.gridSizeButtons = document.querySelectorAll(".grid-size__btn");
 
   els.gradeFilter = document.getElementById("gradeFilter");
   els.examFilter = document.getElementById("examFilter");
@@ -175,6 +182,12 @@ function bindEvents() {
   els.cartCopyBtn.addEventListener("click", copyOrderMessage);
 
   els.themeToggle.addEventListener("click", toggleTheme);
+
+  els.filtersToggle.addEventListener("click", toggleFiltersPanel);
+
+  els.gridSizeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => setGridSize(btn.dataset.size));
+  });
 
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape" && e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
@@ -597,6 +610,45 @@ function toggleTheme() {
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   els.themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+}
+
+// ---- Filtreler paneli (mobilde açılır/kapanır) ----
+const MOBILE_BREAKPOINT = 720;
+
+function initFiltersToggle() {
+  // Mobilde yer kaplamaması için varsayılan olarak kapalı başlar,
+  // masaüstünde açık başlar. Kullanıcı her iki durumda da elle değiştirebilir.
+  const startCollapsed = window.innerWidth <= MOBILE_BREAKPOINT;
+  setFiltersPanelState(!startCollapsed);
+}
+
+function toggleFiltersPanel() {
+  const isOpen = els.filtersToggle.getAttribute("aria-expanded") === "true";
+  setFiltersPanelState(!isOpen);
+}
+
+function setFiltersPanelState(open) {
+  els.filtersPanel.classList.toggle("is-collapsed", !open);
+  els.filtersToggle.setAttribute("aria-expanded", String(open));
+  els.filtersChevron.textContent = open ? "▾" : "▸";
+}
+
+// ---- Kart görünüm boyutu (kaç kitap aynı anda görünsün) ----
+const GRID_SIZE_STORAGE_KEY = "yksKatalogGorunumBoyutu";
+const GRID_SIZE_PX = { small: "170px", medium: "230px", large: "320px" };
+
+function initGridSize() {
+  const saved = localStorage.getItem(GRID_SIZE_STORAGE_KEY);
+  setGridSize(GRID_SIZE_PX[saved] ? saved : "medium");
+}
+
+function setGridSize(size) {
+  if (!GRID_SIZE_PX[size]) return;
+  document.documentElement.style.setProperty("--card-min-width", GRID_SIZE_PX[size]);
+  localStorage.setItem(GRID_SIZE_STORAGE_KEY, size);
+  els.gridSizeButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.size === size);
+  });
 }
 
 // ---- Yardımcılar ----
